@@ -25,9 +25,18 @@ class Block {
             this.timestamps + JSON.stringify(this.transactions) + this.previousHash
         ).toString()
     }
+
+    hasValidTransaction(){
+        for(const tx of this.transactions){
+            if(!tx.isValid()){
+                return false;
+            }
+            return  true;
+        }
+    }
 }
 
-class Transcation {
+class Transaction {
     constructor(fromAddress, toAddress, amount) {
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
@@ -89,7 +98,7 @@ class BlockChain {
         block.mineBlock(this.difficulty);
         this.chain.push(block);
         this.pendingTransactions = [
-            new Transcation(null, minerAddress, this.miningReward)
+            new Transaction(null, minerAddress, this.miningReward)
         ];
 
     }
@@ -128,8 +137,8 @@ class BlockChain {
 
 console.time('execution timer');
 let crossCoin = new BlockChain();
-crossCoin.createTransaction(new Transcation("address", "address2", 100))
-crossCoin.createTransaction(new Transcation("address", "address2", 50))
+crossCoin.createTransaction(new Transaction("address", "address2", 100))
+crossCoin.createTransaction(new Transaction("address", "address2", 50))
 crossCoin.minePendingTransaction("maruf-address");
 console.log(crossCoin.getAddressOfBalance("maruf-address"));
 crossCoin.minePendingTransaction("maruf-address");
