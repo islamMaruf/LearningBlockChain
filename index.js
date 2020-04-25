@@ -1,16 +1,17 @@
 const sha256 = require('crypto-js/sha256');
 
 class Block {
-    constructor(data, previousHash = null) {
-        this.data = data;
+    constructor(timestamps, transactions, previousHash = null) {
+        this.transactions = transactions;
         this.previousHash = previousHash;
-        this.timestamps = Date.now();
+        this.timestamps = timestamps;
         this.hash = this.calculateHash();
         this.nonce = 0;
     }
 
     mineBlock(difficulty) {
-        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+        //   while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0"))
+        while (this.nonce < 4) {
             this.nonce++;
             this.hash = this.calculateHash();
         }
@@ -19,9 +20,20 @@ class Block {
 
     calculateHash() {
         return sha256(
-            JSON.stringify(this.data) + this.previousHash
+            this.timestamps + JSON.stringify(this.transactions) + this.previousHash
         ).toString()
     }
+}
+
+class Transcation {
+    constructor(fromAddress,toAddress,amount) {
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+
+    }
+
+
 }
 
 class BlockChain {
@@ -62,7 +74,7 @@ class BlockChain {
 
 
 let data = {name: 'maruf', age: 56};
-let block = new Block(data);
+let block = new Block(Date.now(), data);
 let jossCoin = new BlockChain();
 console.time('execution timer');
 jossCoin.addBlock(block);
