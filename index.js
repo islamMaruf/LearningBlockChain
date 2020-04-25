@@ -6,6 +6,15 @@ class Block {
         this.previousHash = previousHash;
         this.timestamps = Date.now();
         this.hash = this.calculateHash();
+        this.nonce = 0;
+    }
+
+    mineBlock(difficulty) {
+        while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
+            this.nonce ++;
+            this.hash = this.calculateHash();
+        }
+        console.log("Mining done \n and hash "+ this.hash)
     }
 
     calculateHash() {
@@ -37,11 +46,11 @@ class BlockChain {
     isBlockChainValid() {
         for (let i = 0; i < this.chain.length; i++) {
             const currentBlock = this.chain[i];
-            const previousBlock = this.chain[i-1];
-            if(currentBlock.hash !== currentBlock.calculateHash()){
+            const previousBlock = this.chain[i - 1];
+            if (currentBlock.hash !== currentBlock.calculateHash()) {
                 return false;
             }
-            if( currentBlock.previousHash !== previousBlock.hash){
+            if (currentBlock.previousHash !== previousBlock.hash) {
                 return false;
             }
             return true;
