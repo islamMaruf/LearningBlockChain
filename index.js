@@ -26,12 +26,12 @@ class Block {
         ).toString()
     }
 
-    hasValidTransaction(){
-        for(const tx of this.transactions){
-            if(!tx.isValid()){
+    hasValidTransaction() {
+        for (const tx of this.transactions) {
+            if (!tx.isValid()) {
                 return false;
             }
-            return  true;
+            return true;
         }
     }
 }
@@ -65,8 +65,8 @@ class Transaction {
         if (!this.signature || this.signature.length === 0) {
             throw new Error("No signature found")
         }
-        const key = ec.keyFromPublic(this.fromAddress,"hex")
-        key.verify(this.calculateHash(),this.signature)
+        const key = ec.keyFromPublic(this.fromAddress, "hex")
+        key.verify(this.calculateHash(), this.signature)
 
     }
 
@@ -89,7 +89,13 @@ class BlockChain {
         return this.chain[this.chain.length - 1];
     }
 
-    createTransaction(transaction) {
+    addTransaction(transaction) {
+        if (!transaction.fromAddress || !transaction.toAddress) {
+            throw new Error("Can not precess transaction")
+        }
+        if(!transaction.isValid()){
+            throw new Error("Transaction invalid")
+        }
         this.pendingTransactions.push(transaction)
     }
 
@@ -111,6 +117,9 @@ class BlockChain {
                 return false;
             }
             if (currentBlock.previousHash !== previousBlock.hash) {
+                return false;
+            }
+            if (!currentBlock.hasValidTransaction()) {
                 return false;
             }
             return true;
@@ -137,8 +146,8 @@ class BlockChain {
 
 console.time('execution timer');
 let crossCoin = new BlockChain();
-crossCoin.createTransaction(new Transaction("address", "address2", 100))
-crossCoin.createTransaction(new Transaction("address", "address2", 50))
+crossCoin.addTransaction(new Transaction("address", "address2", 100))
+crossCoin.addTransaction(new Transaction("address", "address2", 50))
 crossCoin.minePendingTransaction("maruf-address");
 console.log(crossCoin.getAddressOfBalance("maruf-address"));
 crossCoin.minePendingTransaction("maruf-address");
