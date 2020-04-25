@@ -1,4 +1,6 @@
 const sha256 = require('crypto-js/sha256');
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');
 
 class Block {
     constructor(timestamps, transactions, previousHash = null) {
@@ -26,10 +28,36 @@ class Block {
 }
 
 class Transcation {
-    constructor(fromAddress,toAddress,amount) {
+    constructor(fromAddress, toAddress, amount) {
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
+
+    }
+
+    calculateHash() {
+        return sha256(this.fromAddress + this.toAddress + this.amount)
+    }
+
+    signTransaction(key) {
+        if (key.getPublic("hex") !== this.fromAddress) {
+            throw new Error("You don't have access")
+        }
+        const hashTx = this.calculateHash();
+        const signature = key.sign(hashTx, "base64");
+        this.signature = signature.toDER();
+
+    }
+
+    isValid() {
+        if (this.fromAddress === null) {
+            return true;
+        }
+        if (!this.signature || this.signature.length === 0) {
+            throw new Error("No signature found")
+        }
+        const key = ec.keyFromPublic(this.fromAddress,"hex")
+        key.verify(this.calculateHash(),this.signature)
 
     }
 
@@ -41,30 +69,31 @@ class BlockChain {
         this.chain = [this.generateGenesisBlock()];
         this.difficulty = 1;
         this.pendingTransactions = [];
-        this.miningReward =  10;
+        this.miningReward = 10;
     }
 
     generateGenesisBlock() {
-        return new Block(Date.now(),[],'0000');
+        return new Block(Date.now(), [], '0000');
     }
 
     getLatestBlock() {
         return this.chain[this.chain.length - 1];
     }
 
-    createTransaction(transaction){
+    createTransaction(transaction) {
         this.pendingTransactions.push(transaction)
     }
 
-    minePendingTransaction(minerAddress){
-        let block = new Block(Date.now(),this.pendingTransactions);
+    minePendingTransaction(minerAddress) {
+        let block = new Block(Date.now(), this.pendingTransactions);
         block.mineBlock(this.difficulty);
         this.chain.push(block);
         this.pendingTransactions = [
-            new Transcation(null,minerAddress,this.miningReward)
+            new Transcation(null, minerAddress, this.miningReward)
         ];
 
     }
+
     isBlockChainValid() {
         for (let i = 0; i < this.chain.length; i++) {
             const currentBlock = this.chain[i];
@@ -78,13 +107,15 @@ class BlockChain {
             return true;
         }
     }
-    getAddressOfBalance(address){
+
+    getAddressOfBalance(address) {
         let balance = 0;
-        for(const block of this.chain){
-            for(const trans of block.transactions){
-                if(trans.fromAddress === address){
+        for (const block of this.chain) {
+            for (const trans of block.transactions) {
+                if (trans.fromAddress === address) {
                     balance -= trans.amount
-                } if(trans.toAddress === address){
+                }
+                if (trans.toAddress === address) {
                     balance += trans.amount
                 }
             }
@@ -97,8 +128,8 @@ class BlockChain {
 
 console.time('execution timer');
 let crossCoin = new BlockChain();
-crossCoin.createTransaction(new Transcation("address","address2",100))
-crossCoin.createTransaction(new Transcation("address","address2",50))
+crossCoin.createTransaction(new Transcation("address", "address2", 100))
+crossCoin.createTransaction(new Transcation("address", "address2", 50))
 crossCoin.minePendingTransaction("maruf-address");
 console.log(crossCoin.getAddressOfBalance("maruf-address"));
 crossCoin.minePendingTransaction("maruf-address");
