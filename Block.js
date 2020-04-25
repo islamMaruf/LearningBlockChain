@@ -1,4 +1,5 @@
 const sha256 = require('crypto-js/sha256');
+
 class Block {
     constructor(timestamps, transactions, previousHash = null) {
         this.transactions = transactions;

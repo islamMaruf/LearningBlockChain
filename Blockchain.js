@@ -8,7 +8,6 @@ class BlockChain {
         this.pendingTransactions = [];
         this.miningReward = 10;
     }
-
     generateGenesisBlock() {
         return new Block(Date.now(), [], '0000');
     }
@@ -54,7 +53,7 @@ class BlockChain {
         }
     }
 
-    getAddressOfBalance(address) {
+    getBalanceOfAddress(address) {
         let balance = 0;
         for (const block of this.chain) {
             for (const trans of block.transactions) {
