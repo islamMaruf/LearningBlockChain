@@ -12,6 +12,18 @@ class Block {
         ).toString()
     }
 }
+class BlockChain{
+    constructor() {
+        this.chain = [];
+    }
+    addBlock(newBlock){
+        this.chain.push(newBlock);
+    }
+   
+}
+
+
 let data = {name:'maruf',age:56};
 let block = new Block(data,null);
-console.log(block);
+let jossCoin = new BlockChain();
+jossCoin.addBlock(block);
