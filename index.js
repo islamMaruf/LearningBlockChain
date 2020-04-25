@@ -40,6 +40,7 @@ class BlockChain {
     constructor() {
         this.chain = [this.generateGenesisBlock()];
         this.difficulty = 1;
+        this.pendingTransactions = [];
     }
 
     generateGenesisBlock() {
@@ -50,12 +51,17 @@ class BlockChain {
         return this.chain[this.chain.length - 1];
     }
 
-    addBlock(newBlock) {
-        newBlock.previousHash = this.getLatestBlock().hash;
-        newBlock.mineBlock(this.difficulty);
-        this.chain.push(newBlock);
+    createTransaction(transaction){
+        this.pendingTransactions.push(transaction)
     }
 
+    minePendingTransaction(){
+        let block = new Block(Date.now(),this.pendingTransactions);
+        block.mineBlock(this.difficulty);
+        this.chain.push(block);
+        this.pendingTransactions = [];
+
+    }
     isBlockChainValid() {
         for (let i = 0; i < this.chain.length; i++) {
             const currentBlock = this.chain[i];
@@ -70,12 +76,13 @@ class BlockChain {
         }
     }
 
+
 }
 
-
-let data = {name: 'maruf', age: 56};
-let block = new Block(Date.now(), data);
-let jossCoin = new BlockChain();
 console.time('execution timer');
-jossCoin.addBlock(block);
+let crossCoin = new BlockChain();
+crossCoin.createTransaction(new Transcation("address","address2",100))
+crossCoin.createTransaction(new Transcation("address","address2",100))
+crossCoin.minePendingTransaction();
 console.timeEnd('execution timer');
+console.log(crossCoin);
