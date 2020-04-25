@@ -44,7 +44,7 @@ class BlockChain {
     }
 
     generateGenesisBlock() {
-        return new Block("GENSIS", "00000");
+        return new Block(Date.now(),[],'0000');
     }
 
     getLatestBlock() {
@@ -75,6 +75,19 @@ class BlockChain {
             return true;
         }
     }
+    getAddressOfBalance(address){
+        let balance = 0;
+        for(const block of this.chain){
+            for(const trans of block.transactions){
+                if(trans.fromAddress === address){
+                    balance -= trans.ammount
+                } if(trans.toAddress === address){
+                    balance += trans.ammount
+                }
+            }
+        }
+        return balance;
+    }
 
 
 }
@@ -84,5 +97,8 @@ let crossCoin = new BlockChain();
 crossCoin.createTransaction(new Transcation("address","address2",100))
 crossCoin.createTransaction(new Transcation("address","address2",100))
 crossCoin.minePendingTransaction();
-console.timeEnd('execution timer');
 console.log(crossCoin);
+
+crossCoin.createTransaction("address1");
+crossCoin.getAddressOfBalance("address2");
+console.timeEnd('execution timer');
