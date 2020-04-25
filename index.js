@@ -11,15 +11,15 @@ class Block {
 
     mineBlock(difficulty) {
         while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
-            this.nonce ++;
+            this.nonce++;
             this.hash = this.calculateHash();
         }
-        console.log("Mining done \n and hash "+ this.hash)
+        console.log("Mining done \n Hash: " + this.hash)
     }
 
     calculateHash() {
         return sha256(
-            this.timestamps + JSON.stringify(this.data) + this.previousHash
+            JSON.stringify(this.data) + this.previousHash
         ).toString()
     }
 }
@@ -27,6 +27,7 @@ class Block {
 class BlockChain {
     constructor() {
         this.chain = [this.generateGenesisBlock()];
+        this.difficulty = 1;
     }
 
     generateGenesisBlock() {
@@ -39,7 +40,7 @@ class BlockChain {
 
     addBlock(newBlock) {
         newBlock.previousHash = this.getLatestBlock().hash;
-        newBlock.hash = newBlock.calculateHash();
+        newBlock.mineBlock(this.difficulty);
         this.chain.push(newBlock);
     }
 
@@ -63,6 +64,6 @@ class BlockChain {
 let data = {name: 'maruf', age: 56};
 let block = new Block(data);
 let jossCoin = new BlockChain();
+console.time('execution timer');
 jossCoin.addBlock(block);
-jossCoin.addBlock(new Block({name: 'maruf islam', 'age': 56}))
-console.log(jossCoin);
+console.timeEnd('execution timer');
