@@ -4,10 +4,11 @@ const Transaction = require('./Transaction');
 class BlockChain {
     constructor() {
         this.chain = [this.generateGenesisBlock()];
-        this.difficulty = 1;
+        this.difficulty = 0;
         this.pendingTransactions = [];
         this.miningReward = 10;
     }
+
     generateGenesisBlock() {
         return new Block(Date.now(), [], '0000');
     }
@@ -22,6 +23,12 @@ class BlockChain {
         }
         if (!transaction.isValid()) {
             throw new Error("Transaction invalid")
+        }
+        if (transaction.amount < 0) {
+            throw new Error("Invalid transaction amount")
+        }
+        if (transaction.amount > this.getBalanceOfAddress(transaction.fromAddress)) {
+            throw new Error("Not enough balance")
         }
         this.pendingTransactions.push(transaction)
     }

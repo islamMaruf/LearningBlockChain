@@ -31,7 +31,6 @@ class Transaction {
         }
         const key = ec.keyFromPublic(this.fromAddress, "hex");
         return key.verify(this.calculateHash(), this.signature)
-
     }
 }
 
