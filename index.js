@@ -41,6 +41,7 @@ class BlockChain {
         this.chain = [this.generateGenesisBlock()];
         this.difficulty = 1;
         this.pendingTransactions = [];
+        this.miningReward =  10;
     }
 
     generateGenesisBlock() {
@@ -55,11 +56,13 @@ class BlockChain {
         this.pendingTransactions.push(transaction)
     }
 
-    minePendingTransaction(){
+    minePendingTransaction(minerAddress){
         let block = new Block(Date.now(),this.pendingTransactions);
         block.mineBlock(this.difficulty);
         this.chain.push(block);
-        this.pendingTransactions = [];
+        this.pendingTransactions = [
+            new Transcation(null,minerAddress,this.miningReward)
+        ];
 
     }
     isBlockChainValid() {
@@ -80,9 +83,9 @@ class BlockChain {
         for(const block of this.chain){
             for(const trans of block.transactions){
                 if(trans.fromAddress === address){
-                    balance -= trans.ammount
+                    balance -= trans.amount
                 } if(trans.toAddress === address){
-                    balance += trans.ammount
+                    balance += trans.amount
                 }
             }
         }
@@ -95,10 +98,9 @@ class BlockChain {
 console.time('execution timer');
 let crossCoin = new BlockChain();
 crossCoin.createTransaction(new Transcation("address","address2",100))
-crossCoin.createTransaction(new Transcation("address","address2",100))
-crossCoin.minePendingTransaction();
-console.log(crossCoin);
-
-crossCoin.createTransaction("address1");
-crossCoin.getAddressOfBalance("address2");
+crossCoin.createTransaction(new Transcation("address","address2",50))
+crossCoin.minePendingTransaction("maruf-address");
+console.log(crossCoin.getAddressOfBalance("maruf-address"));
+crossCoin.minePendingTransaction("maruf-address");
+console.log(crossCoin.getAddressOfBalance("maruf-address"));
 console.timeEnd('execution timer');
