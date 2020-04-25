@@ -19,8 +19,9 @@ class BlockChain {
     constructor() {
         this.chain = [this.generateGenesisBlock()];
     }
-    generateGenesisBlock(){
-        return new Block("GENSIS","00000");
+
+    generateGenesisBlock() {
+        return new Block("GENSIS", "00000");
     }
 
     getLatestBlock() {
@@ -31,6 +32,20 @@ class BlockChain {
         newBlock.previousHash = this.getLatestBlock().hash;
         newBlock.hash = newBlock.calculateHash();
         this.chain.push(newBlock);
+    }
+
+    isBlockChainValid() {
+        for (let i = 0; i < this.chain.length; i++) {
+            const currentBlock = this.chain[i];
+            const previousBlock = this.chain[i-1];
+            if(currentBlock.hash !== currentBlock.calculateHash()){
+                return false;
+            }
+            if( currentBlock.previousHash !== previousBlock.hash){
+                return false;
+            }
+            return true;
+        }
     }
 
 }
